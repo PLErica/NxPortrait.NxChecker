@@ -5,11 +5,19 @@ namespace NxCheck.Core.Checks.Support;
 /// <summary>`ss` 출력 파서.</summary>
 public static partial class SsParser
 {
+    /// <summary>TCP 리스너 포트 집합(예: nginx 80/443). 파싱은 <see cref="ListenerPorts"/>와 동일.</summary>
+    public static IReadOnlySet<int> TcpListenerPorts(string ssOutput, string? processContains = null) =>
+        ListenerPorts(ssOutput, processContains);
+
+    /// <summary>UDP 리스너 포트 집합(예: syslog-ng 5140~5144).</summary>
+    public static IReadOnlySet<int> UdpListenerPorts(string ssOutput, string? processContains = null) =>
+        ListenerPorts(ssOutput, processContains);
+
     /// <summary>
-    /// UDP 리스너의 Local 포트 집합. processContains가 주어지면 해당 프로세스 라인만.
+    /// ss 출력의 Local 포트 집합. processContains가 주어지면 해당 프로세스 라인만.
     /// IPv4(`0.0.0.0:5140`)·IPv6(`[::]:5140`)·와일드카드(`*:5140`)를 포트로만 정규화 → v4/v6 자동 합쳐짐.
     /// </summary>
-    public static IReadOnlySet<int> UdpListenerPorts(string ssOutput, string? processContains = null)
+    public static IReadOnlySet<int> ListenerPorts(string ssOutput, string? processContains = null)
     {
         var ports = new HashSet<int>();
 
