@@ -47,8 +47,10 @@ public sealed class FakeCommandRunner : ICommandRunner
     public FakeCommandRunner WhenStdoutSequence(string fileName, string[] argsContain, params string[] stdouts) =>
         WhenSequence(fileName, argsContain, [.. stdouts.Select(s => Ok(fileName, s))]);
 
+    // argsContain의 각 항목이 어느 인자에든 부분 문자열로 들어 있으면 매칭
+    // (curl의 URL 인자처럼 합성된 인자도 잡기 위함).
     private static Func<string, IReadOnlyList<string>, bool> Matcher(string fileName, string[] argsContain) =>
-        (f, a) => f == fileName && argsContain.All(a.Contains);
+        (f, a) => f == fileName && argsContain.All(sub => a.Any(arg => arg.Contains(sub, StringComparison.Ordinal)));
 
     public static CommandResult Ok(string fileName, string stdout, int exitCode = 0) =>
         new() { FileName = fileName, Arguments = "", Started = true, ExitCode = exitCode, StdOut = stdout };
