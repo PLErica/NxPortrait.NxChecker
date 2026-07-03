@@ -10,7 +10,7 @@ namespace NxCheck.Tests;
 public sealed class FakeCommandRunner : ICommandRunner
 {
     private readonly Dictionary<string, CommandResult> _byFile = new();
-    private readonly List<(Func<string, IReadOnlyList<string>, bool> Match, CommandResult Result)> _matchers = [];
+    private readonly List<(Func<string, IReadOnlyList<string>, bool> Match, Func<CommandResult> Provide)> _matchers = [];
 
     public List<(string File, IReadOnlyList<string> Args)> Calls { get; } = [];
 
@@ -29,12 +29,26 @@ public sealed class FakeCommandRunner : ICommandRunner
     /// <summary>file 이면서 args에 매칭 인자를 모두 포함할 때의 응답.</summary>
     public FakeCommandRunner When(string fileName, string[] argsContain, CommandResult result)
     {
-        _matchers.Add(((f, a) => f == fileName && argsContain.All(a.Contains), result));
+        _matchers.Add((Matcher(fileName, argsContain), () => result));
         return this;
     }
 
     public FakeCommandRunner WhenStdout(string fileName, string[] argsContain, string stdout, int exitCode = 0) =>
         When(fileName, argsContain, Ok(fileName, stdout, exitCode));
+
+    /// <summary>연속 호출마다 순서대로 다른 응답(두 시점 샘플 등). 마지막은 반복.</summary>
+    public FakeCommandRunner WhenSequence(string fileName, string[] argsContain, params CommandResult[] seq)
+    {
+        var i = 0;
+        _matchers.Add((Matcher(fileName, argsContain), () => seq[Math.Min(i++, seq.Length - 1)]));
+        return this;
+    }
+
+    public FakeCommandRunner WhenStdoutSequence(string fileName, string[] argsContain, params string[] stdouts) =>
+        WhenSequence(fileName, argsContain, [.. stdouts.Select(s => Ok(fileName, s))]);
+
+    private static Func<string, IReadOnlyList<string>, bool> Matcher(string fileName, string[] argsContain) =>
+        (f, a) => f == fileName && argsContain.All(a.Contains);
 
     public static CommandResult Ok(string fileName, string stdout, int exitCode = 0) =>
         new() { FileName = fileName, Arguments = "", Started = true, ExitCode = exitCode, StdOut = stdout };
@@ -47,9 +61,9 @@ public sealed class FakeCommandRunner : ICommandRunner
     {
         Calls.Add((fileName, args));
 
-        foreach (var (match, result) in _matchers)
+        foreach (var (match, provide) in _matchers)
             if (match(fileName, args))
-                return Task.FromResult(result);
+                return Task.FromResult(provide());
 
         var byFile = _byFile.TryGetValue(fileName, out var r)
             ? r

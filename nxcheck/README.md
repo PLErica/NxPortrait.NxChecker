@@ -30,7 +30,7 @@ dotnet run --project Cli -- --once --json --expected ./expected.yaml
 종료코드: `0`=전부 통과, `1`=경고, `2`=치명적.
 `error`/`skip` 매핑은 `ExitCodePolicy` 참조 (critical error→2, 비critical error→1, skip 무영향).
 
-## 구현 현황 (골격)
+## 구현 현황
 
 | 영역 | 상태 |
 |------|------|
@@ -38,16 +38,20 @@ dotnet run --project Cli -- --once --json --expected ./expected.yaml
 | CommandRunner (타임아웃·로케일 고정) | ✅ |
 | 엔진 / 카탈로그 / 리포터(콘솔·JSON) | ✅ |
 | CLI(--once/triage) · Daemon(주기·systemd) 골격 | ✅ |
+| 공유 헬퍼 (SystemdProbe·UfwStatusParser·IpAddr·Bonding·NginxStream·Ss·SyslogNgStats·ProcNetUdp·DropRateEvaluator) | ✅ |
 | `hosts` 체크 | ✅ |
 | `nxcollector` 체크 (core ESTAB·서비스·크래시루프) | ✅ |
-| `SystemdProbe` 헬퍼 (is-active/enabled/NRestarts, 공유) | ✅ |
-| `netplan` `elasticsearch` `syslog-ng` `nginx` `ufw` `crosscheck` | ⬜ 스텁(SKIP) — 설계 4.x 참조 |
-| 단위 테스트 | ✅ 35개 통과 (정책·로더·hosts·nxcollector·엔진·러너) |
+| `ufw` 체크 (status verbose·before.rules ICMP·drift·syslog 교차) | ✅ |
+| `netplan` 체크 (yaml·실제IP·bonding·게이트웨이 ping) | ✅ |
+| `crosscheck` (nginx↔syslog-ng 포트 집합 정합) | ✅ |
+| `drop` (flow 드랍률 delta·2단 임계·최소표본·리셋 가드) | ✅ |
+| `elasticsearch` `syslog-ng` `nginx` | ⬜ 스텁(SKIP) — 설계 4.3/4.4/4.5 |
+| 단위 테스트 | ✅ 95개 통과 |
 
 ## 남은 일
 
-- 6개 체크 모듈 구현 (각 파일 상단 TODO 주석에 항목 정리)
+- 3개 체크 모듈 구현: `elasticsearch`(_cat/health·heap·watermark) · `syslog-ng`(다중 인스턴스·문법·바인드) · `nginx`(-t·TLS·listen·stream)
 - 기대값 누락 시 대화형 입력(TTY) 훅
-- flow 드랍 delta 샘플링(2단 20/30%, 최소표본 가드, 카운터 리셋 가드)
+- (선택) 데몬 flow delta를 주기 기반으로(현재 one-shot은 SampleWindow 대기)
 
 > 빌드/실행은 Ubuntu 서버(x64)에서. 리눅스 도구(`ss`,`nginx -T` 등) 호출은 그 환경에서만 의미 있음.

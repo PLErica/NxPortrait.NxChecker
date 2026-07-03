@@ -11,12 +11,14 @@ internal static class TestContext
         ICommandRunner runner,
         ExpectedSpec? expected = null,
         RunMode mode = RunMode.Once,
-        CheckDepth depth = CheckDepth.Static) =>
+        CheckDepth depth = CheckDepth.Static,
+        TimeSpan? sampleWindow = null) =>
         new()
         {
             Mode = mode,
             Depth = depth,
             Expected = expected ?? ExpectedSpec.Empty,
             Runner = runner,
+            SampleWindow = sampleWindow ?? TimeSpan.Zero, // 테스트는 대기 없이
         };
 }

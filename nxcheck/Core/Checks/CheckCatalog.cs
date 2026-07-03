@@ -13,5 +13,6 @@ public static class CheckCatalog
         new NxCollectorCheck(),
         new UfwCheck(),
         new CrossCheck(),
+        new DropRateCheck(),
     ];
 }
