@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="Core/NxCheck.Core.csproj" />
+    <Project Path="Cli/NxCheck.Cli.csproj" />
+    <Project Path="Daemon/NxCheck.Daemon.csproj" />
+    <Project Path="Tests/NxCheck.Tests.csproj" />
+  </Folder>
+</Solution>

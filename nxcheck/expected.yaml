@@ -1,0 +1,41 @@
+# nxcheck 기대값 스펙(정답지). 서버 역할이 달라지면 이 파일만 교체.
+# 비워두거나 섹션을 생략하면 해당 체크는 SKIP(대화형 모드면 입력 프롬프트).
+
+hostname: 01.nxportrait
+
+network:
+  ip: 10.0.0.5
+  gateway: 10.0.0.1
+  dns:
+    - 10.0.0.1
+  bond:
+    name: bond0
+    mode: 802.3ad
+    slaves:
+      - eno1
+      - eno2
+
+elasticsearch:
+  url: https://00.mxlandscape:44371
+  nodes: 3
+  username: nxcheck
+  password_env: NXCHECK_ES_PASSWORD   # 비밀번호는 환경변수로
+  ca_file: /etc/elasticsearch/certs/http_ca.crt
+
+nxcollector:
+  core:
+    host: 01.nxportrait.core
+    port: 5141
+
+syslog:
+  ports: [5140, 5141, 5142, 5143, 5144]
+
+drop:
+  warn_pct: 20
+  critical_pct: 30
+  min_samples: 100
+  sample_window_seconds: 10
+
+ufw:
+  allowed_ports: [22, 80, 443, 5140, 5141, 5142, 5143, 5144]
+  require_icmp_drop: true
