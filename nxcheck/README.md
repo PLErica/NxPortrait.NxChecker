@@ -38,13 +38,15 @@ dotnet run --project Cli -- --once --json --expected ./expected.yaml
 | CommandRunner (타임아웃·로케일 고정) | ✅ |
 | 엔진 / 카탈로그 / 리포터(콘솔·JSON) | ✅ |
 | CLI(--once/triage) · Daemon(주기·systemd) 골격 | ✅ |
-| `hosts` 체크 | ✅ (구현 예시) |
-| `netplan` `elasticsearch` `syslog-ng` `nginx` `nxcollector` `ufw` `crosscheck` | ⬜ 스텁(SKIP) — 설계 4.x 참조 |
-| 단위 테스트 | ✅ 27개 통과 (정책·로더·hosts·엔진·러너) |
+| `hosts` 체크 | ✅ |
+| `nxcollector` 체크 (core ESTAB·서비스·크래시루프) | ✅ |
+| `SystemdProbe` 헬퍼 (is-active/enabled/NRestarts, 공유) | ✅ |
+| `netplan` `elasticsearch` `syslog-ng` `nginx` `ufw` `crosscheck` | ⬜ 스텁(SKIP) — 설계 4.x 참조 |
+| 단위 테스트 | ✅ 35개 통과 (정책·로더·hosts·nxcollector·엔진·러너) |
 
 ## 남은 일
 
-- 7개 체크 모듈 구현 (각 파일 상단 TODO 주석에 항목 정리)
+- 6개 체크 모듈 구현 (각 파일 상단 TODO 주석에 항목 정리)
 - 기대값 누락 시 대화형 입력(TTY) 훅
 - flow 드랍 delta 샘플링(2단 20/30%, 최소표본 가드, 카운터 리셋 가드)
 

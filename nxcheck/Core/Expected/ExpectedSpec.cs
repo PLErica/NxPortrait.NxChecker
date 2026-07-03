@@ -45,6 +45,12 @@ public sealed class ElasticsearchSpec
 
 public sealed class NxCollectorSpec
 {
+    /// <summary>systemd 유닛 / 프로세스 이름(기본 nxcollector).</summary>
+    public string Unit { get; set; } = "nxcollector";
+
+    /// <summary>설정 파일 경로(있으면 존재 여부 확인).</summary>
+    public string? ConfigPath { get; set; }
+
     public CoreEndpoint? Core { get; set; }
 }
 
