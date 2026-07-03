@@ -64,6 +64,12 @@ public sealed class SyslogSpec
 {
     /// <summary>nginx가 분배 / syslog-ng가 들어야 하는 UDP 포트 집합(예: 5140~5144).</summary>
     public List<int>? Ports { get; set; }
+
+    /// <summary>
+    /// 다중 인스턴스 유닛 이름 템플릿(예: "syslog-ng@{port}"). "{port}"가 포트로 치환된다.
+    /// null이면 단일 유닛("syslog-ng")으로 검사.
+    /// </summary>
+    public string? UnitTemplate { get; set; }
 }
 
 public sealed class DropSpec
